@@ -13,7 +13,13 @@ class Board():
 	def changeBoardHit(self, row, col): self.board[row][col] = '*'
 
 	def changeBoardShip(self, ship):
-		if ship[0][0] == ship[1][0]:
+		print(ship)
+		if len(ship) == 1:
+			for coord in ship:
+				col, row = coord
+				self.board[row][col] = '>'
+
+		elif ship[0][0] == ship[1][0]:
 			for coord in ship:
 				col, row = coord
 				self.board[row][col] = '^'
@@ -21,6 +27,7 @@ class Board():
 			for coord in ship:
 				col, row = coord
 				self.board[row][col] = '>'
+
 		
 	def printBoard(self):
 		print('  ', end = ' ')
@@ -76,7 +83,13 @@ class Player(Board):
 		size = int(input('Выберите размер корабля\n1. 1-палубный\n2. 2-палубный\n3. 3-палубный\n4. 4-палубный\n\nВыбор: '))
 
 		if size == 1:
-			ship = input('Введите координаты (пример: a-1): ').split('-')
+			coords = input('Введите координаты (пример: a-1): ')
+			coords = [coords]
+			print(coords)
+			if getShip(coords) != False:
+				ship = getShip(coords)
+			else:
+				return False
 
 		elif size == 2:
 			coords = input('Введите координаты (пример: a-1;a-2): ').split(';')
@@ -174,13 +187,30 @@ class Game():
 				player2_name = 'Player2'
 
 			def loop():
-				size = input('Введите размер доски (пример: 10х10): ').split('x')
+				size = input('\nВведите размер доски (пример: 10х10): ').split('x')
 				if len(size) != 2 or not size[0].isdigit() or not size[1].isdigit() or int(size[0]) > 26 or int(size[1]) > 26 or int(size[0]) <= 0 or int(size[1]) <= 0:
 					print('Неверный ввод!')
 					loop()
 
+				board = Board(int(size[0]), int(size[1]))
 				player1 = Player(player1_name, int(size[0]), int(size[1]))
 				player2 = Player(player2_name, int(size[0]), int(size[1]))
+				player1.setBoard()
+				player2.setBoard()
+
+
+				players = [player1, player2]
+
+				while True:
+					for player in players:
+						for _ in range(2):
+							clear()
+							print('Расстановка кораблей для {}'.format(player.name))
+							player.printBoard()
+							player.setShip()
+							for ship in player.ships:
+								player.changeBoardShip(ship)
+
 
 
 			loop()
@@ -190,8 +220,7 @@ class Game():
 		# 		print('Неверный ввод!')
 		# 		loop()
 
-		#changes
-		# else:
+		# 	else:
 		# 		players = self.setPlayers()
 		# 		board = Board(int(size[0]), int(size[1]))
 		# 		board.setBoard()
@@ -223,20 +252,16 @@ class Game():
 		# 						cont()
 		# 				main()
 		# loop()
-			
-import string, sys, os
+if __name__ == '__main__':
+	import string, sys, os
 
-board = Board(10, 10)
-player1 = Player('Player1', 10, 10)
-player2 = Player('Player2', 10, 10)
-for _ in range(2):
-	player2.setShip()
-player2.setBoard()
-for ship in player2.ships:
-	player2.changeBoardShip(ship)
-player2.printBoard()
-# player1.getMove(player2)
-# player1.setBoard()
-# player1.changeBoardMiss(1, 1)
-# player1.printBoard()
+	def cont(): return input('\n.....Введите символ чтобы продолжить.....')
+	def clear(): 
+		if sys.platform.startswith('win'):
+			return os.system('cls')
+		else:
+			return os.system('clear')
+
+	game = Game()
+	game.startGame()
 
